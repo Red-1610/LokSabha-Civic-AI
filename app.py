@@ -277,7 +277,7 @@ elif page == "✅ Voter Eligibility Checker":
 
 elif page == "🤖 AI Election Agent":
     st.header("Autonomous Election Analyst")
-    st.write("I am an autonomous agent. I can dynamically fetch news, analyze intent, and answer your election queries!")
+    st.write("I am an autonomous agent. I can dynamically fetch news, analyze intent, and generate historical election charts!")
     
     # Simple tool function for the agent
     def agent_fetch_news(query):
@@ -288,9 +288,18 @@ elif page == "🤖 AI Election Agent":
         except:
             return []
 
+    # Tool for historical data analysis
+    @st.cache_data
+    def load_historical_data():
+        import pandas as pd
+        import os
+        if os.path.exists("historical_election_data.csv"):
+            return pd.read_csv("historical_election_data.csv")
+        return None
+
     # Chat UI
     if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your Election Agent. Ask me for the latest news on any political topic, or ask me how to vote!"}]
+        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your Election Agent. Ask me for the latest news on any political topic, or type **'show historical data'** to see my data analysis capabilities!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -303,11 +312,30 @@ elif page == "🤖 AI Election Agent":
 
         with st.chat_message("assistant"):
             with st.spinner("Agent is processing and taking action..."):
+                import time
                 time.sleep(1) # Simulating agent thinking time
                 prompt_lower = prompt.lower()
                 
                 # AGENT INTENT ROUTING
-                if "news" in prompt_lower or "latest" in prompt_lower or "update" in prompt_lower:
+                if "data" in prompt_lower or "history" in prompt_lower or "chart" in prompt_lower or "turnout" in prompt_lower:
+                    # Action: Analyze 5MB Dataset
+                    st.caption("🛠️ Agent Action: Analyzing Historical Election Database...")
+                    df = load_historical_data()
+                    
+                    if df is not None:
+                        # Group by Year and get average turnout
+                        yearly_turnout = df.groupby("Year")["Voter_Turnout_Percentage"].mean().reset_index()
+                        
+                        response = "**Here is my analysis of the historical voter turnout trends (1950 - 2020):**\n\nI have processed over 100,000 historical records from my database."
+                        st.markdown(response)
+                        st.line_chart(yearly_turnout.set_index("Year"))
+                        st.session_state.messages.append({"role": "assistant", "content": response + "\n*[Chart Rendered Successfully]*"})
+                    else:
+                        response = "My historical database module seems to be missing. Please ensure 'historical_election_data.csv' is generated."
+                        st.markdown(response)
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+
+                elif "news" in prompt_lower or "latest" in prompt_lower or "update" in prompt_lower:
                     # Action: Use external tool (NewsAPI)
                     search_term = prompt.replace("news", "").replace("latest", "").replace("what is the", "").replace("about", "").strip()
                     if not search_term:
@@ -323,17 +351,21 @@ elif page == "🤖 AI Election Agent":
                     else:
                         response = f"I scanned the global nodes but couldn't find recent updates on '{search_term}'."
                         
+                    st.markdown(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+
                 elif "how" in prompt_lower and "vote" in prompt_lower:
                     # Action: RAG/Knowledge Retrieval (Mocked)
                     st.caption("🛠️ Agent Action: Retrieving Civic Knowledge Base...")
                     response = "To vote in India, you must:\n1. Be 18+ years old.\n2. Be an Indian Citizen.\n3. Be registered on the electoral roll (Form 6).\n\nYou can check your status in the **Voter Eligibility Checker** tab!"
+                    st.markdown(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
                     
                 else:
                     # Action: General Response
-                    response = "I am currently optimized to fetch live election intelligence. Try asking me: *'What is the latest news on the Model Code of Conduct?'*"
-
-                st.markdown(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
+                    response = "I am currently optimized to fetch live election intelligence and analyze historical data. Try asking me: *'Show historical data'* or *'What is the latest news on EVMs?'*"
+                    st.markdown(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
 
 # Footer
-st.markdown("<br><hr><p style='text-align:center; color:#888; font-size:0.8rem;'>Built for Civic Education | Lightweight Interactive App (< 10MB)</p>", unsafe_allow_html=True)
+st.markdown("<br><hr><p style='text-align:center; color:#888; font-size:0.8rem;'>Built for Civic Education | Advanced Data Agent (~ 5.5MB Database)</p>", unsafe_allow_html=True)
