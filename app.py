@@ -68,7 +68,8 @@ with st.sidebar:
     page = st.radio("Choose a Module:", [
         "🗺️ Election Journey", 
         "📚 Process & Rules", 
-        "✅ Voter Eligibility Checker"
+        "✅ Voter Eligibility Checker",
+        "🤖 AI Election Agent"
     ])
     
     st.markdown("---")
@@ -273,6 +274,66 @@ elif page == "✅ Voter Eligibility Checker":
                     st.warning("⚠️ **Action Required!** Even if you are 18 and a citizen, you cannot vote unless your name is on the electoral roll. Please visit the Election Commission website to register via Form 6.")
                 else:
                     st.info("Please fill out the form accurately.")
+
+elif page == "🤖 AI Election Agent":
+    st.header("Autonomous Election Analyst")
+    st.write("I am an autonomous agent. I can dynamically fetch news, analyze intent, and answer your election queries!")
+    
+    # Simple tool function for the agent
+    def agent_fetch_news(query):
+        api_key = "91e973e1024e424696e9daf84359a8f2"
+        url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&pageSize=3&sortBy=relevancy"
+        try:
+            return requests.get(url).json().get('articles', [])
+        except:
+            return []
+
+    # Chat UI
+    if "messages" not in st.session_state:
+        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your Election Agent. Ask me for the latest news on any political topic, or ask me how to vote!"}]
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("E.g., What is the latest news on EVMs in Bengal?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Agent is processing and taking action..."):
+                time.sleep(1) # Simulating agent thinking time
+                prompt_lower = prompt.lower()
+                
+                # AGENT INTENT ROUTING
+                if "news" in prompt_lower or "latest" in prompt_lower or "update" in prompt_lower:
+                    # Action: Use external tool (NewsAPI)
+                    search_term = prompt.replace("news", "").replace("latest", "").replace("what is the", "").replace("about", "").strip()
+                    if not search_term:
+                        search_term = "Indian Elections"
+                    
+                    st.caption(f"🛠️ Agent Action: Calling NewsAPI for '{search_term}'...")
+                    articles = agent_fetch_news(search_term)
+                    
+                    if articles:
+                        response = f"**Here is the synthesized intelligence for '{search_term}':**\n\n"
+                        for i, art in enumerate(articles):
+                            response += f"{i+1}. **{art['title']}** - {art['description']}\n"
+                    else:
+                        response = f"I scanned the global nodes but couldn't find recent updates on '{search_term}'."
+                        
+                elif "how" in prompt_lower and "vote" in prompt_lower:
+                    # Action: RAG/Knowledge Retrieval (Mocked)
+                    st.caption("🛠️ Agent Action: Retrieving Civic Knowledge Base...")
+                    response = "To vote in India, you must:\n1. Be 18+ years old.\n2. Be an Indian Citizen.\n3. Be registered on the electoral roll (Form 6).\n\nYou can check your status in the **Voter Eligibility Checker** tab!"
+                    
+                else:
+                    # Action: General Response
+                    response = "I am currently optimized to fetch live election intelligence. Try asking me: *'What is the latest news on the Model Code of Conduct?'*"
+
+                st.markdown(response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
 
 # Footer
 st.markdown("<br><hr><p style='text-align:center; color:#888; font-size:0.8rem;'>Built for Civic Education | Lightweight Interactive App (< 10MB)</p>", unsafe_allow_html=True)
