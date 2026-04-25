@@ -242,7 +242,29 @@ elif page == "✅ Voter Eligibility Checker":
                 
                 if age >= 18 and citizen == "Yes" and registered == "Yes":
                     st.success("🎉 **Congratulations!** You are fully eligible and ready to vote. Keep your Voter ID handy on polling day!")
-                    st.balloons()
+                    # Custom CSS animation for a voting hand instead of balloons
+                    st.markdown("""
+                        <style>
+                        @keyframes vote-animation {
+                            0% { transform: translateY(50px) scale(0.8); opacity: 0; }
+                            50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+                            100% { transform: translateY(0) scale(1); opacity: 1; }
+                        }
+                        .voting-hand-container {
+                            display: flex;
+                            justify-content: center;
+                            margin: 20px 0;
+                            animation: vote-animation 1s ease-out forwards;
+                        }
+                        .voting-hand {
+                            font-size: 80px;
+                            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+                        }
+                        </style>
+                        <div class="voting-hand-container">
+                            <div class="voting-hand">🗳️✋</div>
+                        </div>
+                    """, unsafe_allow_html=True)
                 elif age < 18:
                     st.error(f"⏳ **Not quite yet.** You need to be at least 18 years old to vote. You have {18 - age} year(s) to go!")
                 elif citizen == "No":
