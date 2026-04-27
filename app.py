@@ -218,7 +218,7 @@ if page == "🛸 Command Center":
                      template="plotly_dark",
                      color_discrete_sequence=['#3b82f6'])
         fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=30, b=0))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 elif page == "🗺️ Election Journey":
     st.header("Interactive Mission Protocol")
@@ -270,7 +270,7 @@ elif page == "📊 Data Analytics":
                          template="plotly_dark",
                          title=f"{metric} Trends by State")
             fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
         st.markdown("---")
         st.subheader("Constituency Deep-Dive")
@@ -278,10 +278,10 @@ elif page == "📊 Data Analytics":
         if search:
             res = df[df['Constituency'].str.contains(search, case=False)]
             if not res.empty:
-                st.dataframe(res.head(10), use_container_width=True)
+                st.dataframe(res.head(10), width='stretch')
                 fig_res = px.bar(res, x='Year', y='Voter_Turnout_Percentage', color='Party', barmode='group',
                                 template="plotly_dark", title=f"Performance in {search}")
-                st.plotly_chart(fig_res, use_container_width=True)
+                st.plotly_chart(fig_res, width='stretch')
             else:
                 st.warning("No data found for this constituency.")
 
