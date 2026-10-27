@@ -1,4 +1,4 @@
-# 🗳️ DemocracyOS — Civic Intelligence Platform
+# 🗳️ LokSabha-Civic-AI — Civic Intelligence Platform
 
 **DemocracyOS** is an AI-powered civic education app built with Streamlit that helps every Indian citizen understand the election process, check their voter eligibility, explore historical data, and ask election questions in plain language.
 
