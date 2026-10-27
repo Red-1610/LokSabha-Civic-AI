@@ -351,8 +351,8 @@ def redact_key(value: str) -> str:
 
 
 # ── External APIs ─────────────────────────────────────────────────────────────
-NEWS_API_KEY = os.getenv("NEWS_API_KEY", "91e973e1024e424696e9daf84359a8f2")
-GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
+NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", os.getenv("GOOGLE_API_KEY")
 
 if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
@@ -388,7 +388,7 @@ def call_ai(messages: list[dict], system: str = "") -> str:
             "to enable the AI assistant."
         )
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash", system_instruction=system)
+        model = genai.GenerativeModel("gemini-3.8-flash", system_instruction=system)
         formatted_messages = []
         for m in messages:
             formatted_messages.append({"role": "user" if m["role"] == "user" else "model", "parts": [m["content"]]})
